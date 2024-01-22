@@ -1,8 +1,8 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { UserSetting } from './UserSettings';
 @ObjectType()
 export class User {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @Field((type) => Int)
+  @Field(() => Int)
   id: number;
 
   @Field()
@@ -10,4 +10,7 @@ export class User {
 
   @Field({ nullable: true })
   displayName?: string;
+
+  @Field({ nullable: true })
+  settings?: UserSetting;
 }
