@@ -22,6 +22,7 @@ type Query {
 
 type Mutation {
   createUser(createUserData: CreateUserInput!): User!
+  deleteUser(id: Int!): User!
   createUserSettings(createUserSettingsData: CreateUserSettingInput!): UserSetting!
 }
 

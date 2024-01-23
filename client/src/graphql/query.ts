@@ -6,6 +6,10 @@ export const GET_ALL_USERS = gql`
       id
       username
       displayName
+      settings {
+        receiveEmails
+        receiveNotifications
+      }
     }
   }
 `;

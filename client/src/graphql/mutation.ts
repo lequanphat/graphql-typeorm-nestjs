@@ -10,3 +10,10 @@ export const CREATE_USER_MUTATION = gql`
   }
 `;
 
+export const DELETE_USER_MUTAION = gql`
+  mutation ($deleteUserId: Int!) {
+    deleteUser(id: $deleteUserId) {
+      id
+    }
+  }
+`;
