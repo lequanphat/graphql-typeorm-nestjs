@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, theme } from 'antd';
+import { Avatar, Button, Flex, Layout, Menu, theme } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Title from 'antd/es/typography/Title';
+import { AuthContext } from '../context/AuthProvider';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -30,10 +31,15 @@ const items = [
 
 const MainLayout: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  if (!user) {
+    navigate('/auth/login');
+    return;
+  }
   // handle
   const handleNavbar = ({ key }: { key: string }) => {
     switch (key) {
@@ -46,6 +52,9 @@ const MainLayout: React.FC = () => {
       default:
         break;
     }
+  };
+  const handleLogout = () => {
+    user?.auth.signOut();
   };
   // render
   return (
@@ -60,16 +69,38 @@ const MainLayout: React.FC = () => {
           console.log(collapsed, type);
         }}
       >
-        <Title level={3} style={{ color: 'white', padding: '0 20px' }}>
-          LOGO
-        </Title>
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={['1']}
-          items={items}
-          onSelect={handleNavbar}
-        />
+        <Flex
+          style={{
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100vh',
+            padding: '20px 8px',
+          }}
+        >
+          <Flex
+            style={{
+              flexDirection: 'column',
+            }}
+          >
+            <Title level={3} style={{ color: 'white', paddingLeft: '20px' }}>
+              LOGO
+            </Title>
+            <Menu
+              theme="dark"
+              mode="inline"
+              defaultSelectedKeys={['1']}
+              items={items}
+              onSelect={handleNavbar}
+            />
+          </Flex>
+          <Flex style={{ alignItems: 'center' }}>
+            <Avatar src={user?.photoURL} />
+            <Title level={5} style={{ color: 'white', margin: '0 5px 0 5px' }}>
+              {user?.displayName}
+            </Title>
+            <Button onClick={handleLogout}>out</Button>
+          </Flex>
+        </Flex>
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }} />
