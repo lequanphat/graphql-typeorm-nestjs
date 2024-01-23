@@ -1,5 +1,7 @@
 import {
   Button,
+  Checkbox,
+  CheckboxProps,
   Flex,
   Input,
   Modal,
@@ -12,7 +14,11 @@ import { useState } from 'react';
 import { GET_ALL_USERS } from '../graphql/query';
 import { useMutation, useQuery } from '@apollo/client';
 import Title from 'antd/es/typography/Title';
-import { CREATE_USER_MUTATION, DELETE_USER_MUTAION } from '../graphql/mutation';
+import {
+  CREATE_USER_MUTATION,
+  CREATE_USER_SETTING_MUTAION,
+  DELETE_USER_MUTAION,
+} from '../graphql/mutation';
 interface DataType {
   id: string;
   username: number;
@@ -22,6 +28,8 @@ interface DataType {
     receiveNotifications: boolean;
   };
 }
+console.log('render');
+
 const columns: TableColumnsType<DataType> = [
   {
     title: 'ID',
@@ -40,11 +48,9 @@ const columns: TableColumnsType<DataType> = [
     dataIndex: 'settings',
     render: (settings: DataType['settings']) => (
       <Flex>
-        <Tag color={settings?.receiveEmails ? 'green' : 'red'}>
-          Receive Emails
-        </Tag>
+        <Tag color={settings?.receiveEmails ? 'green' : 'red'}>Emails</Tag>
         <Tag color={settings?.receiveNotifications ? 'green' : 'red'}>
-          Receive Notifications
+          Notifications
         </Tag>
       </Flex>
     ),
@@ -53,25 +59,30 @@ const columns: TableColumnsType<DataType> = [
 
 const sizeOfPage = 6;
 const User = () => {
-  const { loading, error, data } = useQuery(GET_ALL_USERS);
+  const { loading, error, data, refetch } = useQuery(GET_ALL_USERS);
   const [createUserMutation] = useMutation(CREATE_USER_MUTATION);
-  const [deleteUserMutaion] = useMutation(DELETE_USER_MUTAION);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [username, setUsername] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [users, setUsers] = useState(data?.getAllUsers || []);
-  console.log(users);
+  const [deleteUserMutation] = useMutation(DELETE_USER_MUTAION);
+  const [createUserSettingMutation] = useMutation(CREATE_USER_SETTING_MUTAION);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isCreateUserOpen, setIsCreateUserOpen] = useState<boolean>(false);
+  const [isSettingUserOpen, setIsSettingUserOpen] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>('');
+  const [displayName, setDisplayName] = useState<string>('');
+  const [selectedUser, setSelectedUser] = useState<React.Key[]>([]);
+
+  const [isReceiveEmailsChecked, setIsReceiveEmailsChecked] =
+    useState<boolean>(false);
+  const [isReceiveNotificationsChecked, setIsReceiveNotificationsChecked] =
+    useState<boolean>(false);
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    setSelectedRowKeys(newSelectedRowKeys);
+  const onSelectChange = (newSelectedUser: React.Key[]) => {
+    setSelectedUser(newSelectedUser);
   };
 
   const rowSelection = {
-    selectedRowKeys,
+    selectedUser,
     onChange: onSelectChange,
   };
   const handleChangePage = (page: number) => {
@@ -86,13 +97,10 @@ const User = () => {
       return value;
     }
   };
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
 
   const handleCreateUser = async () => {
     try {
-      const result = await createUserMutation({
+      await createUserMutation({
         variables: {
           createUserData: {
             username,
@@ -100,46 +108,74 @@ const User = () => {
           },
         },
       });
-      setUsers([...users, result.data.createUser]);
+      refetch();
     } catch (error) {
       console.error('Mutation error:', error);
     }
-    setIsModalOpen(false);
+    setIsCreateUserOpen(false);
     setUsername('');
     setDisplayName('');
   };
   const handleDeleteUser = async () => {
     try {
-      const result = await deleteUserMutaion({
+      await deleteUserMutation({
         variables: {
-          deleteUserId: selectedRowKeys[0],
+          deleteUserId: selectedUser[0],
         },
       });
-      setSelectedRowKeys([]);
-
-      setUsers(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        users.filter((value: any) => value.id !== result.data.deleteUser.id),
-      );
+      setSelectedUser([]);
+      refetch();
     } catch (error) {
       console.error('Mutation error:', error);
     }
   };
+  const handleSettingUser = async () => {
+    try {
+      await createUserSettingMutation({
+        variables: {
+          createUserSettingsData: {
+            userId: selectedUser[0],
+            receiveEmails: isReceiveEmailsChecked,
+            receiveNotifications: isReceiveNotificationsChecked,
+          },
+        },
+      });
+      refetch();
+    } catch (error) {
+      console.error('Mutation error:', error);
+    }
+    setIsSettingUserOpen(false);
+  };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const onReceiveEmailsChange: CheckboxProps['onChange'] = (e) => {
+    setIsReceiveEmailsChecked(e.target.checked);
+  };
+  const onReceiveNotificationsChange: CheckboxProps['onChange'] = (e) => {
+    setIsReceiveNotificationsChecked(e.target.checked);
+  };
+  const handleOpenUserSetting = () => {
+    setIsSettingUserOpen(true);
+    const user = data.getAllUsers.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (user: any) => user.id === selectedUser[0],
+    );
+    setIsReceiveEmailsChecked(user.settings.receiveEmails);
+    setIsReceiveNotificationsChecked(user.settings.receiveNotifications);
   };
 
   return (
     <div>
       <Flex justify="end" style={{ marginBottom: '10px' }}>
+        <Button type="default" onClick={handleOpenUserSetting}>
+          Settings
+        </Button>
         <Button
           danger
           type="primary"
           onClick={() => {
             Modal.confirm({
               title: 'Confirm',
-              content: `Do you want to delete user with id ${selectedRowKeys[0]}`,
+              content: `Do you want to delete user with id ${selectedUser[0]}`,
               onOk: handleDeleteUser,
               footer: (_, { OkBtn, CancelBtn }) => (
                 <>
@@ -149,18 +185,25 @@ const User = () => {
               ),
             });
           }}
-          style={{ marginRight: '10px' }}
+          style={{ margin: '0 10px' }}
         >
           Delete
         </Button>
-        <Button type="primary" onClick={showModal}>
+        <Button
+          type="primary"
+          onClick={() => {
+            setIsCreateUserOpen(true);
+          }}
+        >
           Add User +
         </Button>
         <Modal
-          title="Basic Modal"
-          open={isModalOpen}
+          title="Create User"
+          open={isCreateUserOpen}
           onOk={handleCreateUser}
-          onCancel={handleCancel}
+          onCancel={() => {
+            setIsCreateUserOpen(false);
+          }}
         >
           <Title level={5}>Username</Title>
           <Input
@@ -179,9 +222,40 @@ const User = () => {
             }}
           />
         </Modal>
+        <Modal
+          title="User Settings"
+          open={isSettingUserOpen}
+          onOk={handleSettingUser}
+          onCancel={() => {
+            setIsSettingUserOpen(false);
+          }}
+        >
+          <Title level={4}>
+            {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              data.getAllUsers.find(
+                (value: any) => value.id === selectedUser[0],
+              )?.displayName
+            }
+          </Title>
+          <Flex style={{ flexDirection: 'column' }}>
+            <Checkbox
+              checked={isReceiveEmailsChecked}
+              onChange={onReceiveEmailsChange}
+            >
+              Receive Emails
+            </Checkbox>
+            <Checkbox
+              checked={isReceiveNotificationsChecked}
+              onChange={onReceiveNotificationsChange}
+            >
+              Receive Notifications
+            </Checkbox>
+          </Flex>
+        </Modal>
       </Flex>
       <Table
-        dataSource={users.filter(handlePagination)}
+        dataSource={data.getAllUsers.filter(handlePagination)}
         columns={columns}
         pagination={false}
         rowSelection={rowSelection}
@@ -190,7 +264,7 @@ const User = () => {
       <Flex justify="end" style={{ paddingTop: '24px' }}>
         <Pagination
           current={currentPage}
-          total={users.length}
+          total={data.getAllUsers.length}
           onChange={handleChangePage}
           defaultPageSize={sizeOfPage}
         />

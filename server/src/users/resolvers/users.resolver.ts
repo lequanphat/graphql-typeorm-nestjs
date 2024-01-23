@@ -41,7 +41,17 @@ export class UsersResolver {
     return this.usersService.createUser(createUserData);
   }
   @Mutation(() => User)
-  deleteUser(@Args('id', { type: () => Int }) id: number) {
-    return this.usersService.deleteUser(id);
+  async deleteUser(@Args('id', { type: () => Int }) id: number) {
+    const user = await this.usersService.deleteUser(id);
+    console.log('====================================');
+    console.log(user);
+    console.log('====================================');
+    if (user.settings) {
+      console.log('====================================');
+      console.log(user);
+      console.log('====================================');
+      await this.userSettingService.deleteUserSetting(id);
+    }
+    return user;
   }
 }

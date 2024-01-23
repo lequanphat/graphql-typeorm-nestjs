@@ -30,4 +30,12 @@ export class UserSettingService {
     this.usersRepository.save(findUser);
     return settings;
   }
+  async deleteUserSetting(userId: number) {
+    const userSetting = await this.usersSettingRepository.findOne({
+      where: { userId },
+    });
+    if (!userSetting) throw new Error('User settings not found!!!');
+    await this.usersSettingRepository.delete({ userId });
+    return userSetting;
+  }
 }

@@ -24,7 +24,10 @@ export class UsersService {
     });
   }
   async deleteUser(id: number) {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['settings'],
+    });
     if (!user) throw new Error('User not found!!!');
     await this.userRepository.delete({ id });
     return user;

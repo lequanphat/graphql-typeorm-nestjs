@@ -17,3 +17,13 @@ export const DELETE_USER_MUTAION = gql`
     }
   }
 `;
+
+export const CREATE_USER_SETTING_MUTAION = gql`
+  mutation ($createUserSettingsData: CreateUserSettingInput!) {
+    createUserSettings(createUserSettingsData: $createUserSettingsData) {
+      userId
+      receiveEmails
+      receiveNotifications
+    }
+  }
+`;
