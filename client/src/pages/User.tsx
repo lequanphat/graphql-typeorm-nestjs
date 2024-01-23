@@ -159,8 +159,8 @@ const User = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (user: any) => user.id === selectedUser[0],
     );
-    setIsReceiveEmailsChecked(user.settings.receiveEmails);
-    setIsReceiveNotificationsChecked(user.settings.receiveNotifications);
+    setIsReceiveEmailsChecked(user.settings?.receiveEmails);
+    setIsReceiveNotificationsChecked(user.settings?.receiveNotifications);
   };
 
   return (
@@ -232,8 +232,8 @@ const User = () => {
         >
           <Title level={4}>
             {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               data.getAllUsers.find(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (value: any) => value.id === selectedUser[0],
               )?.displayName
             }
