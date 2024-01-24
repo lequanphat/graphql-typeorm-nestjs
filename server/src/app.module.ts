@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './graphql/models/User';
 import { UserSetting } from './graphql/models/UserSettings';
 import { UsersModule } from './users/users.module';
+import { DB_CONFIG } from './config';
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -16,11 +17,11 @@ import { UsersModule } from './users/users.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      port: 3306,
-      host: 'localhost',
-      username: 'root',
-      password: '',
-      database: 'graphql_tutorial',
+      port: parseInt(DB_CONFIG.PORT),
+      host: DB_CONFIG.HOST,
+      username: DB_CONFIG.USERNAME,
+      password: DB_CONFIG.PASSWORD,
+      database: DB_CONFIG.NAME,
       entities: [User, UserSetting],
       synchronize: true,
     }),
