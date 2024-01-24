@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   Checkbox,
   CheckboxProps,
@@ -21,14 +22,16 @@ import {
 } from '../graphql/mutation';
 interface DataType {
   id: string;
-  username: number;
+  email: number;
   displayName: string;
+  avatar: string;
   settings: {
     receiveEmails: boolean;
     receiveNotifications: boolean;
   };
+
+  type: string;
 }
-console.log('render');
 
 const columns: TableColumnsType<DataType> = [
   {
@@ -36,8 +39,17 @@ const columns: TableColumnsType<DataType> = [
     dataIndex: 'id',
   },
   {
+    title: 'Avatar',
+    dataIndex: 'avatar',
+    render: (avatar: DataType['avatar']) => (
+      <Flex>
+        <Avatar src={avatar} alt={avatar} />
+      </Flex>
+    ),
+  },
+  {
     title: 'Username',
-    dataIndex: 'username',
+    dataIndex: 'email',
   },
   {
     title: 'DisplayName',
@@ -55,6 +67,15 @@ const columns: TableColumnsType<DataType> = [
       </Flex>
     ),
   },
+  {
+    title: 'Type',
+    dataIndex: 'type',
+    render: (type: DataType['type']) => (
+      <Flex>
+        <Tag color={type === 'system' ? 'default' : 'cyan'}>{type}</Tag>
+      </Flex>
+    ),
+  },
 ];
 
 const sizeOfPage = 6;
@@ -66,7 +87,7 @@ const User = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isCreateUserOpen, setIsCreateUserOpen] = useState<boolean>(false);
   const [isSettingUserOpen, setIsSettingUserOpen] = useState<boolean>(false);
-  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [displayName, setDisplayName] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<React.Key[]>([]);
 
@@ -103,7 +124,7 @@ const User = () => {
       await createUserMutation({
         variables: {
           createUserData: {
-            username,
+            email,
             displayName,
           },
         },
@@ -113,7 +134,7 @@ const User = () => {
       console.error('Mutation error:', error);
     }
     setIsCreateUserOpen(false);
-    setUsername('');
+    setEmail('');
     setDisplayName('');
   };
   const handleDeleteUser = async () => {
@@ -207,10 +228,10 @@ const User = () => {
         >
           <Title level={5}>Username</Title>
           <Input
-            placeholder="Enter username..."
-            value={username}
+            placeholder="Email address..."
+            value={email}
             onChange={(e) => {
-              setUsername(e.target.value);
+              setEmail(e.target.value);
             }}
           />
           <Title level={5}>Displayname</Title>

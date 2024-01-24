@@ -8,13 +8,13 @@ const client = new ApolloClient({
 });
 const App: React.FC = () => {
   return (
-    <ApolloProvider client={client}>
-      <BrowserRouter>
+    <BrowserRouter>
+      <ApolloProvider client={client}>
         <AuthProvider>
           <Router />
         </AuthProvider>
-      </BrowserRouter>
-    </ApolloProvider>
+      </ApolloProvider>
+    </BrowserRouter>
   );
 };
 

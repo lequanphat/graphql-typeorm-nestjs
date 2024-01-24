@@ -13,7 +13,6 @@ const AuthProvider = ({ children }: { children: ReactElement }) => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const unsubribed = auth.onIdTokenChanged((user: any) => {
-      console.log('auth provider', { user });
       if (user?.uid) {
         setUser(user);
         localStorage.setItem('accessToken', user?.accessToken);

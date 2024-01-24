@@ -4,7 +4,7 @@ export const CREATE_USER_MUTATION = gql`
   mutation createUser($createUserData: CreateUserInput!) {
     createUser(createUserData: $createUserData) {
       id
-      username
+      email
       displayName
     }
   }
@@ -24,6 +24,14 @@ export const CREATE_USER_SETTING_MUTAION = gql`
       userId
       receiveEmails
       receiveNotifications
+    }
+  }
+`;
+
+export const CREATE_GOOGLE_USER_MUTATION = gql`
+  mutation ($createUserData: CreateUserInput!) {
+    createGoogleUser(createUserData: $createUserData) {
+      type
     }
   }
 `;
