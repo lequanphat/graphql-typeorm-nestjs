@@ -1,1 +1,1 @@
-# graphql-typeorm
+# Basic GraphQL and TypeORM in NestJS
