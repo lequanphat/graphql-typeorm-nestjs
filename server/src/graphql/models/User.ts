@@ -16,11 +16,19 @@ export class User {
 
   @Column()
   @Field()
-  username: string;
+  email: string;
 
   @Column({ nullable: true })
   @Field({ nullable: true })
   displayName?: string;
+
+  @Column({ default: '' })
+  @Field({ defaultValue: '' })
+  avatar: string;
+
+  @Column({ default: 'system' })
+  @Field({ defaultValue: 'system' })
+  type: string;
 
   @OneToOne(() => UserSetting)
   @JoinColumn()

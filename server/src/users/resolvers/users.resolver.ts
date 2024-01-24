@@ -25,6 +25,10 @@ export class UsersResolver {
   getUserById(@Args('id', { type: () => Int }) id: number) {
     return this.usersService.getUserByID(id);
   }
+  @Query(() => User, { nullable: true })
+  getUserByEmail(@Args('email', { type: () => String }) email: string) {
+    return this.usersService.getUserByEmail(email);
+  }
 
   @Query(() => [User])
   getAllUsers() {
@@ -41,15 +45,15 @@ export class UsersResolver {
     return this.usersService.createUser(createUserData);
   }
   @Mutation(() => User)
+  createGoogleUser(@Args('createUserData') createUserData: CreateUserInput) {
+    return this.usersService.createGoogleUser(createUserData);
+  }
+
+  @Mutation(() => User)
   async deleteUser(@Args('id', { type: () => Int }) id: number) {
     const user = await this.usersService.deleteUser(id);
-    console.log('====================================');
-    console.log(user);
-    console.log('====================================');
     if (user.settings) {
-      console.log('====================================');
       console.log(user);
-      console.log('====================================');
       await this.userSettingService.deleteUserSetting(id);
     }
     return user;

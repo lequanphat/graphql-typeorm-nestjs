@@ -10,25 +10,31 @@ type UserSetting {
 
 type User {
   id: Int!
-  username: String!
+  email: String!
   displayName: String
+  avatar: String!
+  type: String!
   settings: UserSetting
 }
 
 type Query {
   getUserById(id: Int!): User
+  getUserByEmail(email: String!): User
   getAllUsers: [User!]!
 }
 
 type Mutation {
   createUser(createUserData: CreateUserInput!): User!
+  createGoogleUser(createUserData: CreateUserInput!): User!
   deleteUser(id: Int!): User!
   createUserSettings(createUserSettingsData: CreateUserSettingInput!): UserSetting!
 }
 
 input CreateUserInput {
-  username: String!
+  email: String!
   displayName: String
+  avatar: String! = ""
+  type: String! = "system"
 }
 
 input CreateUserSettingInput {

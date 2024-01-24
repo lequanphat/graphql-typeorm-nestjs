@@ -17,6 +17,14 @@ export class UsersService {
     const user = this.userRepository.create(createUserData);
     return this.userRepository.save(user);
   }
+  async createGoogleUser(createUserData: CreateUserInput) {
+    const user = await this.userRepository.findOne({
+      where: { email: createUserData.email, type: 'google' },
+    });
+    if (user) return user;
+    const newUser = await this.userRepository.create(createUserData);
+    return this.userRepository.save(newUser);
+  }
   getUserByID(id: number) {
     return this.userRepository.findOne({
       where: { id },
@@ -30,6 +38,13 @@ export class UsersService {
     });
     if (!user) throw new Error('User not found!!!');
     await this.userRepository.delete({ id });
+    return user;
+  }
+  async getUserByEmail(email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
+    if (!user) throw new Error('User not found!!!');
     return user;
   }
 }
