@@ -1,6 +1,8 @@
 /client/node_modules
+/client/dist
 /client/.env
 
 /server/dist
 /server/node_modules
 /server/.env
+/server/compose.yaml

@@ -2,7 +2,10 @@ import { ReactElement, createContext, useEffect, useState } from 'react';
 import { getAuth, User } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
-export const AuthContext = createContext({ user: undefined, setUser: {} });
+export const AuthContext = createContext({
+  user: undefined as User | undefined,
+  setUser: {},
+});
 
 const AuthProvider = ({ children }: { children: ReactElement }) => {
   const navigate = useNavigate();

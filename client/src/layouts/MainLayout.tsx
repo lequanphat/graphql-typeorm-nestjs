@@ -8,6 +8,7 @@ import { Avatar, Button, Flex, Layout, Menu, theme } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Title from 'antd/es/typography/Title';
 import { AuthContext } from '../context/AuthProvider';
+import { getAuth } from 'firebase/auth';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -30,6 +31,7 @@ const items = [
 ];
 
 const MainLayout: React.FC = () => {
+  const auth = getAuth();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const {
@@ -54,7 +56,7 @@ const MainLayout: React.FC = () => {
     }
   };
   const handleLogout = () => {
-    user?.auth.signOut();
+    auth.signOut();
   };
   // render
   return (
