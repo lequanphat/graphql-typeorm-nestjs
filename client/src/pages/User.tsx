@@ -10,6 +10,7 @@ import {
   Table,
   TableColumnsType,
   Tag,
+  message,
 } from 'antd';
 import { useState } from 'react';
 import { GET_ALL_USERS } from '../graphql/query';
@@ -95,6 +96,7 @@ const User = () => {
     useState<boolean>(false);
   const [isReceiveNotificationsChecked, setIsReceiveNotificationsChecked] =
     useState<boolean>(false);
+  const [messageApi, contextHolder] = message.useMessage();
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -175,6 +177,13 @@ const User = () => {
     setIsReceiveNotificationsChecked(e.target.checked);
   };
   const handleOpenUserSetting = () => {
+    if (selectedUser.length === 0) {
+      messageApi.open({
+        type: 'warning',
+        content: 'Please choose an user to setting!!!',
+      });
+      return;
+    }
     setIsSettingUserOpen(true);
     const user = data.getAllUsers.find(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -187,6 +196,7 @@ const User = () => {
   return (
     <div>
       <Flex justify="end" style={{ marginBottom: '10px' }}>
+        {contextHolder}
         <Button type="default" onClick={handleOpenUserSetting}>
           Settings
         </Button>
@@ -194,6 +204,13 @@ const User = () => {
           danger
           type="primary"
           onClick={() => {
+            if (selectedUser.length === 0) {
+              messageApi.open({
+                type: 'warning',
+                content: 'Please choose an user to setting!!!',
+              });
+              return;
+            }
             Modal.confirm({
               title: 'Confirm',
               content: `Do you want to delete user with id ${selectedUser[0]}`,

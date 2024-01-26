@@ -3,9 +3,10 @@ import Router from './routes';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import AuthProvider from './context/AuthProvider';
 const client = new ApolloClient({
-  uri: 'http://localhost:2411/graphql',
+  uri: import.meta.env.VITE_API_URL,
   cache: new InMemoryCache(),
 });
+
 const App: React.FC = () => {
   return (
     <BrowserRouter>
