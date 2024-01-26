@@ -6,3 +6,4 @@
 - Using basic TypeORM (MySQL)
 - OAuth with Firebase
 - Using Ant Design for Front-end
+- Build image with Docker Engine
